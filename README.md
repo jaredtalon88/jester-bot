@@ -1,6 +1,16 @@
-# learning-go-by-examples
+# Setup
 
-This repository contains examples seen in [Learning Go by examples](https://dev.to/aurelievache/learning-go-by-examples-introduction-448n) article series on Dev.to.
+* Register a discord bot
+* export BOT_TOKEN to your bot's token
+* Enable all Privileged Gateway Intents in discord
 
+* Install https://github.com/AUTOMATIC1111/stable-diffusion-webui
+* Enable API by editing `webui-user.bat` to include `set COMMANDLINE_ARGS=--xformers --autolaunch --listen --api`
+* Start server
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/scraly/learning-go-by-examples.git)
+# Usage
+
+* Run bot with `go run main.go -t $BOT_TOKEN`
+* Send command !img followed by a prompt for the txt2img AI
+
+Example: !img a sunny winter day in colorado
