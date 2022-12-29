@@ -22,6 +22,7 @@ var (
 	Token string
 )
 
+// The URL of the Local Stable Diffusion API
 const StableDiffURL = "http://127.0.0.1:7860"
 
 func init() {
@@ -61,10 +62,8 @@ func main() {
 	dg.Close()
 }
 
-type Gopher struct {
-	Name string `json: "name"`
-}
-
+// This is the payload returned by the StableDiffusionAPI
+// Right now all I use is Images but nice to have
 type StableDiff struct {
 	Images     []string `json:"images"`
 	Parameters struct {
@@ -111,45 +110,35 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.Content == "!hello" {
-
-		// check on da bot
-
-		_, err := s.ChannelMessageSend(m.ChannelID, "i am alive")
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-
+	// Since we are using an "all-in-one" command, just check that the message
+	// begins correctly and assume the rest is fine.
 	if strings.HasPrefix(m.Content, "!img") {
 
-		// parrot back our command
-
+		// Ignore the command and grab the prompt
 		prompt := strings.TrimPrefix(m.Content, "!img ")
 
-		_, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("making an img with prompt: %s", prompt))
-		if err != nil {
-			fmt.Println(err)
-		}
-
+		// This is the payload we are sending to the StableDiffAPI
 		values := map[string]string{"prompt": prompt, "steps": "30"}
 
+		// Turn it into JSON
 		json_data, err := json.Marshal(values)
-
 		if err != nil {
 			log.Fatal(err)
 		}
 
+		// Send the JSON to the StableDiffAPI
 		resp, err := http.Post(StableDiffURL+"/sdapi/v1/txt2img", "application/json",
 			bytes.NewBuffer(json_data))
-
 		if err != nil {
 			log.Fatal(err)
 		}
 
+		// Wait until the image is done being processed
 		defer resp.Body.Close()
 
+		// If the API responds w/ a 200 continue
 		if resp.StatusCode == 200 {
+			// Read the full response
 			body, err := ioutil.ReadAll(resp.Body)
 
 			if err != nil {
@@ -157,16 +146,18 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}
 
 			var result StableDiff
-			if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
+			// Unmarshal the response into the struct we made called StableDiff
+			if err := json.Unmarshal(body, &result); err != nil {
 				fmt.Println("Can not unmarshal JSON")
 			}
 
+			// Grab the encoded image from the images key and turn it into a string
 			raw_imgdata := fmt.Sprintf(result.Images[0])
 
-			// reader := strings.NewReader(imgdata)
-
+			// Decode the string and read it
 			decoded_img_data := base64.NewDecoder(base64.StdEncoding, strings.NewReader(raw_imgdata))
 
+			// Send the decoded image data to discord and tell it to name it image.png
 			_, err = s.ChannelFileSend(m.ChannelID, "image.png", decoded_img_data)
 			if err != nil {
 				fmt.Println(err)
