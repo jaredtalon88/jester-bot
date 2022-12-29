@@ -127,11 +127,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		prompt := strings.TrimPrefix(m.Content, "!img ")
 
-		_, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("making an img with prompt: %s", prompt))
-		if err != nil {
-			fmt.Println(err)
-		}
-
 		values := map[string]string{"prompt": prompt, "steps": "30"}
 
 		json_data, err := json.Marshal(values)
