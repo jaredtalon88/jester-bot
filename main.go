@@ -118,7 +118,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		prompt := strings.TrimPrefix(m.Content, "!img ")
 
 		// This is the payload we are sending to the StableDiffAPI
-		values := map[string]string{"prompt": prompt, "steps": "30"}
+		values := map[string]string{"prompt": prompt, "steps": "64", "sampler_index": "Euler a"}
 
 		// Turn it into JSON
 		json_data, err := json.Marshal(values)
@@ -162,6 +162,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			if err != nil {
 				fmt.Println(err)
 			}
+
+			fmt.Println(result.Info)
 
 		} else {
 			fmt.Println("Error: Something went wrong")
