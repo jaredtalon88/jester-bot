@@ -15,6 +15,7 @@ import (
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
+	zlog "github.com/rs/zerolog/log"
 )
 
 // Variables used for command line parameters
@@ -24,6 +25,7 @@ var (
 
 // The URL of the Local Stable Diffusion API
 const StableDiffURL = "http://127.0.0.1:7860"
+const MCServerGenURL = "http://some-cloud-run.app"
 
 func init() {
 	flag.StringVar(&Token, "t", "", "Bot Token")
@@ -123,14 +125,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// Turn it into JSON
 		json_data, err := json.Marshal(values)
 		if err != nil {
-			log.Fatal(err)
+			log.Print(err)
 		}
 
 		// Send the JSON to the StableDiffAPI
 		resp, err := http.Post(StableDiffURL+"/sdapi/v1/txt2img", "application/json",
 			bytes.NewBuffer(json_data))
 		if err != nil {
-			log.Fatal(err)
+			log.Print(err)
 		}
 
 		// Wait until the image is done being processed
@@ -168,6 +170,13 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		} else {
 			fmt.Println("Error: Something went wrong")
 		}
-	}
+	} else if strings.HasPrefix(m.Content, "!server") {
+		command := strings.TrimPrefix(m.Content, "!server ")
 
+		resp, err := http.Get(MCServerGenURL + "/" + command)
+		if err != nil {
+			zlog.Print(err)
+		}
+		zlog.Print(resp)
+	}
 }

@@ -1,3 +1,10 @@
+# Jester Bot
+
+## Features
+
+* Stable Diffusion AI Integration
+* ITZG Minecraft Server Generator 
+
 # Setup
 
 * Register a discord bot
@@ -12,5 +19,12 @@
 
 * Run bot with `go run main.go -t $BOT_TOKEN`
 * Send command !img followed by a prompt for the txt2img AI
+* Send command !server followed by ["start", "stop", "save"]
 
-Example: !img a sunny winter day in colorado
+# Build
+
+# Tests
+
+# Commands
+
+* !img a sunny winter day in colorado
